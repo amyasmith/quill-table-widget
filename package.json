@@ -6,9 +6,9 @@
 	"license": "PUBLIC DOMAIN",
 	"author": "amyasmith",
 	"repository": {
-    	"type": "git",
+		"type": "git",
 		"url": "https://github.com/amyasmith/quill-table-widget.git"
-	}
+	},
 	"dependencies": {
 		"quill": "^2.0.0"
 	}
