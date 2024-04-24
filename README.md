@@ -1,6 +1,8 @@
 # quill-table-widget
 A basic UI module for managing tables with Quill v2
 
+[Demo](https://amyasmith.github.io/quill-table-widget/)
+
 ## Features:
 
  - Adds a menu to the toolbar for adding tables of various sizes
