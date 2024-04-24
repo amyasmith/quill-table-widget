@@ -18,8 +18,8 @@ export default function Widget(quill, _options) {
 				: quill.getLength();
 			const bounds = quill.getBounds(rangeStart, rangeEnd); //get bounds
 			const widget = document.getElementById("wi-widget"); //get widget
-			widget.style.top = bounds.top - 11 + "px"; //position widget (11px is half its width)
-			widget.style.left = bounds.left + bounds.width - 11 + "px";
+			widget.style.top = bounds.top - 11 + "px"; //position widget (11px is half its height)
+			widget.style.right = "4px"; //4px is the margin (15px) minus half its width (again 11px)
 			widget.setAttribute("class", "ql-tablewidget"); //unhide widget
 		} else {
 			//we are not in a table
