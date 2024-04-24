@@ -132,7 +132,7 @@ const getToolbarButton = (quill, options) => {
 		for (let j = d[0]; j > 0; j--) {
 			//do in reverse order so CSS ~ selector works
 			let createButton = document.createElement("div");
-			createButton.setAttribute("class", `wi-${j}-${i} wi-addtable`);
+			createButton.setAttribute("class", `wicol-${j} wi-addtable`);
 			createButton.addEventListener("pointerenter", () => {
 				document.getElementById("wi-tooltip-header").innerText = `New Table: ${j}x${i}`;
 			});

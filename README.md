@@ -37,7 +37,7 @@ const quill = new Quill(editorContainer, {
 
 `toolbarOffset: number`: If specified, moves toolbar button to preceed child `n` of the toolbar. Negative numbers are supported, e.g. `-1` will place it before the last child. If unspecified the button is added to the end of the toolbar.
 
-`maxSize: [number, number]`: Change the maximum size of table that can be created, valid between 2x2 and 12x12. Default is 5x6.
+`maxSize: [number, number]`: Change the maximum size of table that can be created, valid between 2x2 and 10x10. Default is 5x6.
 
 Both the table and tableWidget modules must be enabled.
 
