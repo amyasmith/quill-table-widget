@@ -9,21 +9,15 @@ export default function Widget(quill, _options) {
 
 	quill.on(Quill.events.SELECTION_CHANGE, (range, oldRange, source) => {
 		const tableModule = quill.getModule("table");
-		const [table, _row, _cell, _offset] = tableModule.getTable();
+		const table = tableModule.getTable()[0];
 		if (table) {
 			//we are in a table
-			const rangeStart = quill.getIndex(table.rows()[0]); //get first row indices
-			const rangeEnd = table.rows()[0].next
-				? quill.getIndex(table.rows()[0].next)
-				: quill.getLength();
-			const bounds = quill.getBounds(rangeStart, rangeEnd); //get bounds
-			const widget = document.getElementById("wi-widget"); //get widget
-			widget.style.top = bounds.top - 11 + "px"; //position widget (11px is half its height)
-			widget.style.right = "4px"; //4px is the margin (15px) minus half its width (again 11px)
-			widget.setAttribute("class", "ql-tablewidget"); //unhide widget
+			const index = quill.getIndex(table.rows()[0]); //get location of first row
+			const bounds = quill.getBounds(index); //get bounds
+			showWidget(bounds);
 		} else {
 			//we are not in a table
-			document.getElementById("wi-widget").setAttribute("class", "ql-tablewidget ql-hidden"); //hide widget
+			hideWidget();
 		}
 	});
 }
@@ -35,6 +29,19 @@ const makeTable = (quill, x, y) => {
 		quill.setSelection(0); //i.e. field hasnt been clicked
 	}
 	tableModule.insertTable(x, y);
+	const bounds = quill.getBounds(quill.getSelection());
+	showWidget(bounds); //show widget as table will be under cursor
+};
+
+const hideWidget = () => {
+	document.getElementById("wi-widget").setAttribute("class", "ql-tablewidget ql-hidden");
+};
+
+const showWidget = bounds => {
+	const widget = document.getElementById("wi-widget");
+	widget.style.top = bounds.top - 11 + "px"; //position widget (11px is half its height)
+	widget.style.right = "4px"; //4px is the margin (15px) minus half its width (again 11px)
+	widget.setAttribute("class", "ql-tablewidget"); //unhide widget
 };
 
 const addWidget = quill => {
@@ -63,17 +70,24 @@ const addWidget = quill => {
 		.getElementById("wi-add-column")
 		.addEventListener("click", () => tableModule.insertColumnRight());
 
-	document
-		.getElementById("wi-delete-row")
-		.addEventListener("click", () => tableModule.deleteRow());
+	document.getElementById("wi-delete-row").addEventListener("click", () => {
+		tableModule.deleteRow();
+		if (!tableModule.getTable[0]) {
+			hideWidget();
+		}
+	});
 
-	document
-		.getElementById("wi-delete-column")
-		.addEventListener("click", () => tableModule.deleteColumn());
+	document.getElementById("wi-delete-column").addEventListener("click", () => {
+		tableModule.deleteColumn();
+		if (!tableModule.getTable[0]) {
+			hideWidget();
+		}
+	});
 
-	document
-		.getElementById("wi-delete-table")
-		.addEventListener("click", () => tableModule.deleteTable());
+	document.getElementById("wi-delete-table").addEventListener("click", () => {
+		tableModule.deleteTable();
+		hideWidget();
+	});
 };
 
 const getToolbarButton = quill => {
@@ -93,9 +107,11 @@ const getToolbarButton = quill => {
 	const tooltip = document.createElement("div");
 	tooltip.setAttribute("class", "wi-tooltip");
 	tooltip.innerHTML = `<p id="wi-tooltip-header">New Table</p>`; // + "<button/>".repeat(5 * 6);
-	for (let i = 1; i < 7; i++) {
-		for (let j = 1; j < 6; j++) {
-			let createButton = document.createElement("button");
+	for (let i = 6; i > 0; i--) {
+		for (let j = 5; j > 0; j--) {
+			//do in reverse order so CSS ~ selector works
+			let createButton = document.createElement("div");
+			createButton.setAttribute("class", `wi-${j}-${i} wi-addtable`);
 			createButton.addEventListener("pointerenter", () => {
 				document.getElementById("wi-tooltip-header").innerText = `New Table: ${j}x${i}`;
 			});
@@ -105,6 +121,7 @@ const getToolbarButton = quill => {
 			createButton.addEventListener("click", () => {
 				makeTable(quill, i, j);
 			});
+			createButton.style.order = i * 5 + j; //fix order
 			tooltip.appendChild(createButton);
 		}
 	}
