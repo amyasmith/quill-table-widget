@@ -1,6 +1,6 @@
 {
 	"name": "quill-table-widget",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "A basic UI module for managing tables with Quill v2",
 	"keywords": ["quill", "table", "widget"],
 	"license": "PUBLIC DOMAIN",
