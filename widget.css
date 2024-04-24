@@ -1,0 +1,88 @@
+.wi-tooltip {
+	position: absolute;
+	transform: translateY(20px);
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	border: 1px solid #ccc;
+	background: #fff;
+	z-index: 100;
+	visibility: hidden;
+}
+
+.wi-tooltip:hover {
+	visibility: inherit;
+}
+
+.wi-toolbar-button:focus~.wi-tooltip {
+	visibility: inherit;
+}
+
+.wi-tooltip p {
+	grid-column: 1/6;
+	grid-row: 1;
+	text-align: center;
+	margin: 0.25rem 0;
+	font-size: 13px;
+}
+
+.wi-tooltip button {
+	border: 1px solid #ccc !important;
+	height: 1.25rem !important;
+	width: 1.25rem !important;
+	margin: 1px;
+	background: #eee !important;
+}
+
+.wi-tooltip button:hover {
+	background: #45bce5 !important;
+}
+
+.wi-menu-button {
+	height: 1.375rem;
+	width: 1.375rem;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background: #fff;
+}
+
+.wi-menu-button:hover {
+	background: #d9eeff;
+}
+
+.wi-menu {
+	width: 6rem;
+	transform: translateX(-4.625rem);
+	display: block;
+	position: absolute;
+	visibility: hidden;
+}
+
+.wi-menu-button:focus~.wi-menu {
+	visibility: inherit;
+}
+
+.wi-menu:hover {
+	visibility: inherit;
+}
+
+.wi-menu div {
+	width: 6rem;
+	user-select: none;
+	padding: 2px;
+	border: 1px solid #ccc;
+	color: #444;
+	border-bottom: none;
+	background: #fff;
+}
+
+.wi-menu div:last-of-type {
+	border-bottom: 1px solid #ccc;
+}
+
+.wi-menu div:hover {
+	background: #d9eeff;
+}
+
+.ql-tablewidget {
+	position: absolute;
+}
