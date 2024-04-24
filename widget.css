@@ -66,6 +66,7 @@
 }
 
 .wi-menu div {
+	font-size: 13px !important;
 	width: 6rem;
 	user-select: none;
 	padding: 2px;
