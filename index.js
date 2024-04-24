@@ -1,13 +1,20 @@
 import Quill from "quill";
 import "./widget.css";
+import "./hover.css";
 
-export default function Widget(quill, _options) {
+export default function Widget(quill, options) {
 	const toolbar = quill.getModule("toolbar");
-	toolbar.container.appendChild(getToolbarButton(quill));
+	const toolbarButton = getToolbarButton(quill, options);
+	if (options.toolbarOffset && !!parseInt(options.toolbarOffset)) {
+		const ref = Array.from(toolbar.container.children).at(parseInt(options.toolbarOffset));
+		toolbar.container.insertBefore(toolbarButton, ref);
+	} else {
+		toolbar.container.appendChild(toolbarButton);
+	}
 
 	addWidget(quill);
 
-	quill.on(Quill.events.SELECTION_CHANGE, (range, oldRange, source) => {
+	quill.on(Quill.events.SELECTION_CHANGE, () => {
 		const tableModule = quill.getModule("table");
 		const table = tableModule.getTable()[0];
 		if (table) {
@@ -90,9 +97,10 @@ const addWidget = quill => {
 	});
 };
 
-const getToolbarButton = quill => {
+const getToolbarButton = (quill, options) => {
 	const span = document.createElement("span");
 	span.setAttribute("class", "ql-formats");
+
 	const button = document.createElement("button");
 	button.setAttribute("class", "wi-toolbar-button");
 	button.innerHTML = `<svg viewBox="0 0 18 18">
@@ -104,11 +112,24 @@ const getToolbarButton = quill => {
 		<line class="ql-stroke" x1="3" x2="15" y1="15" y2="15"></line>
 	</svg>`;
 	span.appendChild(button);
+
 	const tooltip = document.createElement("div");
 	tooltip.setAttribute("class", "wi-tooltip");
-	tooltip.innerHTML = `<p id="wi-tooltip-header">New Table</p>`; // + "<button/>".repeat(5 * 6);
-	for (let i = 6; i > 0; i--) {
-		for (let j = 5; j > 0; j--) {
+	let d = [5, 6]; //default
+	if (options.maxSize) {
+		const u = [parseInt(options.maxSize?.[0]), parseInt(options.maxSize?.[1])];
+		//if valid inputs
+		if (u[0] && u[1]) {
+			//clamp to range
+			d = [[2, u[0], 12].sort((a, b) => a - b)[1], [2, u[1], 12].sort((a, b) => a - b)[1]];
+		}
+	}
+	//style text to take up one grid column
+	tooltip.innerHTML = `<p id="wi-tooltip-header" style="grid-column: 1/${d[0] + 1}">New Table</p>`;
+	tooltip.style.gridTemplateColumns = "1fr ".repeat(d[0]); //set grid width
+
+	for (let i = d[1]; i > 0; i--) {
+		for (let j = d[0]; j > 0; j--) {
 			//do in reverse order so CSS ~ selector works
 			let createButton = document.createElement("div");
 			createButton.setAttribute("class", `wi-${j}-${i} wi-addtable`);
@@ -121,7 +142,7 @@ const getToolbarButton = quill => {
 			createButton.addEventListener("click", () => {
 				makeTable(quill, i, j);
 			});
-			createButton.style.order = i * 5 + j; //fix order
+			createButton.style.order = i * d[0] + j; //fix order
 			tooltip.appendChild(createButton);
 		}
 	}
