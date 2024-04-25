@@ -17,6 +17,10 @@ A basic UI module for managing tables with Quill v2
 
 ## Usage
 
+```bash
+npm i quill-table-widget
+```
+
 ```js
 import Widget from "quill-table-widget";
 import Quill from "quill";
