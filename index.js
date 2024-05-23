@@ -14,7 +14,7 @@ export default function Widget(quill, options) {
 
 	addWidget(quill);
 
-	quill.on(Quill.events.SELECTION_CHANGE, () => {
+	quill.on(Quill.events.EDITOR_CHANGE, () => {
 		const tableModule = quill.getModule("table");
 		const table = tableModule.getTable()[0];
 		if (table) {
