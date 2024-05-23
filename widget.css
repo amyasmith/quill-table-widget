@@ -89,4 +89,5 @@
 
 .ql-tablewidget {
 	position: absolute;
+	z-index: 100;
 }

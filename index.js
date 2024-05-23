@@ -2,9 +2,15 @@ import Quill from "quill";
 import "./widget.css";
 import "./hover.css";
 
-export default function Widget(quill, options) {
+const icons = Quill.import('ui/icons');
+
+export default class TableWidget {
+constructor(quill, options) {
+	this.quill = quill;
+	this.options = options;
+
 	const toolbar = quill.getModule("toolbar");
-	const toolbarButton = getToolbarButton(quill, options);
+	const toolbarButton = this.getToolbarButton(options);
 	if (options.toolbarOffset && !!parseInt(options.toolbarOffset)) {
 		const ref = Array.from(toolbar.container.children).at(parseInt(options.toolbarOffset));
 		toolbar.container.insertBefore(toolbarButton, ref);
@@ -12,7 +18,7 @@ export default function Widget(quill, options) {
 		toolbar.container.appendChild(toolbarButton);
 	}
 
-	addWidget(quill);
+	this.addWidget();
 
 	quill.on(Quill.events.EDITOR_CHANGE, () => {
 		const tableModule = quill.getModule("table");
@@ -21,15 +27,16 @@ export default function Widget(quill, options) {
 			//we are in a table
 			const index = quill.getIndex(table.rows()[0]); //get location of first row
 			const bounds = quill.getBounds(index); //get bounds
-			showWidget(bounds);
+			this.showWidget(bounds);
 		} else {
 			//we are not in a table
-			hideWidget();
+			this.hideWidget();
 		}
 	});
 }
 
-const makeTable = (quill, x, y) => {
+makeTable(x, y) {
+	const quill = this.quill
 	const tableModule = quill.getModule("table");
 	if (!quill.getSelection(true)) {
 		//need to set selection if there is none
@@ -37,22 +44,23 @@ const makeTable = (quill, x, y) => {
 	}
 	tableModule.insertTable(x, y);
 	const bounds = quill.getBounds(quill.getSelection());
-	showWidget(bounds); //show widget as table will be under cursor
-};
+	this.showWidget(bounds); //show widget as table will be under cursor
+}
 
-const hideWidget = () => {
-	document.getElementById("wi-widget").setAttribute("class", "ql-tablewidget ql-hidden");
-};
+hideWidget() {
+	this.widget.setAttribute("class", "ql-tablewidget ql-hidden");
+}
 
-const showWidget = bounds => {
-	const widget = document.getElementById("wi-widget");
-	widget.style.top = bounds.top - 11 + "px"; //position widget (11px is half its height)
-	widget.style.right = "4px"; //4px is the margin (15px) minus half its width (again 11px)
-	widget.setAttribute("class", "ql-tablewidget"); //unhide widget
-};
+showWidget(bounds) {
+	this.widget.style.top = bounds.top - 11 + "px"; //position widget (11px is half its height)
+	this.widget.style.right = "4px"; //4px is the margin (15px) minus half its width (again 11px)
+	this.widget.setAttribute("class", "ql-tablewidget"); //unhide widget
+}
 
-const addWidget = quill => {
+addWidget() {
+	const quill = this.quill;
 	const container = quill.addContainer("ql-tablewidget");
+	this.widget = container;
 	container.setAttribute("id", "wi-widget");
 	container.setAttribute("class", "ql-tablewidget ql-hidden");
 	container.innerHTML = `<button class="wi-menu-button"><svg viewBox="0 0 18 18">
@@ -62,60 +70,54 @@ const addWidget = quill => {
 	</svg>
 	</button>
 	<div class="wi-menu">
-		<div id="wi-add-row">Insert Row</div>
-		<div id="wi-add-column">Insert Column</div>
-		<div id="wi-delete-row">Delete Row</div>
-		<div id="wi-delete-column">Delete Column</div>
-		<div id="wi-delete-table">Delete Table</div>
+		<div class="wi-add-row">Insert Row</div>
+		<div class="wi-add-column">Insert Column</div>
+		<div class="wi-delete-row">Delete Row</div>
+		<div class="wi-delete-column">Delete Column</div>
+		<div class="wi-delete-table">Delete Table</div>
 	</div>`;
 	const tableModule = quill.getModule("table");
-	document.getElementById("wi-add-row").addEventListener("click", () => {
+	container.querySelector(".wi-add-row").addEventListener("click", () => {
 		if (!quill.isEnabled()) return;
 		tableModule.insertRowBelow();
 	});
 
-	document.getElementById("wi-add-column").addEventListener("click", () => {
+	container.querySelector(".wi-add-column").addEventListener("click", () => {
 		if (!quill.isEnabled()) return;
 		tableModule.insertColumnRight();
 	});
 
-	document.getElementById("wi-delete-row").addEventListener("click", () => {
+	container.querySelector(".wi-delete-row").addEventListener("click", () => {
 		if (!quill.isEnabled()) return;
 		tableModule.deleteRow();
 		if (!tableModule.getTable[0]) {
-			hideWidget();
+			this.hideWidget();
 		}
 	});
 
-	document.getElementById("wi-delete-column").addEventListener("click", () => {
+	container.querySelector(".wi-delete-column").addEventListener("click", () => {
 		if (!quill.isEnabled()) return;
 		tableModule.deleteColumn();
 		if (!tableModule.getTable[0]) {
-			hideWidget();
+			this.hideWidget();
 		}
 	});
 
-	document.getElementById("wi-delete-table").addEventListener("click", () => {
+	container.querySelector(".wi-delete-table").addEventListener("click", () => {
 		if (!quill.isEnabled()) return;
 		tableModule.deleteTable();
-		hideWidget();
+		this.hideWidget();
 	});
-};
+}
 
-const getToolbarButton = (quill, options) => {
+getToolbarButton(options) {
 	const span = document.createElement("span");
 	span.setAttribute("class", "ql-formats");
+	span.style.position = "relative";
 
 	const button = document.createElement("button");
 	button.setAttribute("class", "wi-toolbar-button");
-	button.innerHTML = `<svg viewBox="0 0 18 18">
-		<rect class="ql-fill" height="5" width="12" x="3" y="1"></rect>
-		<line class="ql-stroke" x1="3" x2="3" y1="2" y2="15"></line>
-		<line class="ql-stroke" x1="15" x2="15" y1="2" y2="15"></line>
-		<line class="ql-stroke" x1="9" x2="9" y1="3" y2="15"></line>
-		<line class="ql-stroke" x1="3" x2="15" y1="10" y2="10"></line>
-		<line class="ql-stroke" x1="3" x2="15" y1="15" y2="15"></line>
-	</svg>`;
+	button.innerHTML = icons.table;
 	span.appendChild(button);
 
 	const tooltip = document.createElement("div");
@@ -130,7 +132,7 @@ const getToolbarButton = (quill, options) => {
 		}
 	}
 	//style text to take up one grid column
-	tooltip.innerHTML = `<p id="wi-tooltip-header" style="grid-column: 1/${d[0] + 1}">New Table</p>`;
+	tooltip.innerHTML = `<p class="wi-tooltip-header" style="grid-column: 1/${d[0] + 1}">New Table</p>`;
 	tooltip.style.gridTemplateColumns = "1fr ".repeat(d[0]); //set grid width
 
 	for (let i = d[1]; i > 0; i--) {
@@ -139,13 +141,13 @@ const getToolbarButton = (quill, options) => {
 			let createButton = document.createElement("div");
 			createButton.setAttribute("class", `wicol-${j} wi-addtable`);
 			createButton.addEventListener("pointerenter", () => {
-				document.getElementById("wi-tooltip-header").innerText = `New Table: ${j}x${i}`;
+				container.querySelector(".wi-tooltip-header").innerText = `New Table: ${j}x${i}`;
 			});
 			createButton.addEventListener("pointerleave", () => {
-				document.getElementById("wi-tooltip-header").innerText = `New Table`;
+				container.querySelector(".wi-tooltip-header").innerText = `New Table`;
 			});
 			createButton.addEventListener("click", () => {
-				makeTable(quill, i, j);
+				this.makeTable(i, j);
 			});
 			createButton.style.order = i * d[0] + j; //fix order
 			tooltip.appendChild(createButton);
@@ -153,4 +155,5 @@ const getToolbarButton = (quill, options) => {
 	}
 	span.appendChild(tooltip);
 	return span;
-};
+}
+}
