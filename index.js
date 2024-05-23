@@ -31,7 +31,7 @@ export default function Widget(quill, options) {
 
 const makeTable = (quill, x, y) => {
 	const tableModule = quill.getModule("table");
-	if (!quill.getSelection()) {
+	if (!quill.getSelection(true)) {
 		//need to set selection if there is none
 		quill.setSelection(0); //i.e. field hasnt been clicked
 	}
